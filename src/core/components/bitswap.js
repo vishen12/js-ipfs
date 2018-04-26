@@ -11,14 +11,15 @@ function formatWantlist (list) {
 
 module.exports = function bitswap (self) {
   return {
-    wantlist: () => {
+    wantlist: promisify((callback) => {
       if (!self.isOnline()) {
-        throw new Error(OFFLINE_ERROR)
+        return setImmediate(() => callback(new Error(OFFLINE_ERROR)))
       }
 
-      const list = self._bitswap.getWantlist()
-      return formatWantlist(list)
-    },
+      let list = self._bitswap.getWantlist()
+      list = formatWantlist(list)
+      callback(null, list)
+    }),
 
     stat: promisify((callback) => {
       if (!self.isOnline()) {
@@ -40,12 +41,12 @@ module.exports = function bitswap (self) {
       })
     }),
 
-    unwant: (key) => {
+    unwant: promisify((key, callback) => {
       if (!self.isOnline()) {
-        throw new Error(OFFLINE_ERROR)
+        return setImmediate(() => callback(new Error(OFFLINE_ERROR)))
       }
 
-      self._bitswap.unwant(key)
-    }
+      callback(null, self._bitswap.unwant(key))
+    })
   }
 }

@@ -17,7 +17,11 @@ module.exports = {
         throw err
       }
 
-      process.stdout.write(block.data)
+      if (block) {
+        process.stdout.write(block.data)
+      } else {
+        process.stderr.write('Block was unwanted before it could be remotely retrieved')
+      }
     })
   }
 }
